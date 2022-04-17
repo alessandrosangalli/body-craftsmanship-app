@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:body_craftsmanship_app/data/food_dummy.dart';
 import 'package:body_craftsmanship_app/models/food.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class FoodProvider with ChangeNotifier {
+  static const _baseUrl =
+      'https://body-craftsmanship-default-rtdb.firebaseio.com/';
   final Map<int, Food> _items = {...DUMMY_FOOD};
 
   List<Food> get all {
@@ -19,7 +23,7 @@ class FoodProvider with ChangeNotifier {
     return _items.values.elementAt(i);
   }
 
-  void put(Food food) {
+  Future<void> put(Food food) async {
     if (food == null) {
       return;
     }
@@ -29,10 +33,20 @@ class FoodProvider with ChangeNotifier {
     if (foodId != null && _items.containsKey(foodId)) {
       _items.update(foodId, (_) => food);
     } else {
-      foodId = Random().nextInt(10);
+      final response = await http.post("$_baseUrl/foods.json",
+          body: json.encode({
+            "name": food.name,
+            "kcal": food.kcal,
+            "grams": food.grams,
+            "proteins": food.proteins,
+            "carbohydrate": food.carbohydrate,
+            "fat": food.fat,
+          }));
+
+      foodId = json.decode(response.body)['name'];
 
       _items.putIfAbsent(
-          foodId,
+          foodId!,
           () => Food(
                 id: foodId,
                 name: food.name,
