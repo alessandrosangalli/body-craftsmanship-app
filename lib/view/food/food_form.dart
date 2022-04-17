@@ -13,6 +13,7 @@ class FoodForm extends StatefulWidget {
 
 class _FoodFormState extends State<FoodForm> {
   final _form = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   final Map<String, dynamic> _formData = {};
 
@@ -45,10 +46,14 @@ class _FoodFormState extends State<FoodForm> {
         title: const Text('Food'),
         actions: <Widget>[
           IconButton(
-              onPressed: () {
+              onPressed: () async {
                 _form.currentState?.save();
 
-                Provider.of<FoodProvider>(context, listen: false).put(
+                setState(() {
+                  _isLoading = true;
+                });
+
+                await Provider.of<FoodProvider>(context, listen: false).put(
                   Food(
                       id: _formData['id'],
                       name: _formData['name'],
@@ -58,61 +63,71 @@ class _FoodFormState extends State<FoodForm> {
                       carbohydrate: _formData['carbohydrate'],
                       fat: _formData['fat']),
                 );
+
+                setState(() {
+                  _isLoading = false;
+                });
+
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.save))
         ],
       ),
-      body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Form(
-            key: _form,
-            child: Column(children: [
-              TextFormField(
-                initialValue: _formData['name'],
-                decoration: const InputDecoration(labelText: 'Name'),
-                onSaved: (value) => _formData['name'] = value,
-              ),
-              TextFormField(
-                initialValue: _formData['grams'].toString(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'Grams'),
-                onSaved: (value) =>
-                    _formData['grams'] = int.parse(value ?? '0'),
-              ),
-              TextFormField(
-                initialValue: _formData['kcal'].toString(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'Kcal'),
-                onSaved: (value) => _formData['kcal'] = int.parse(value ?? '0'),
-              ),
-              TextFormField(
-                initialValue: _formData['proteins'].toString(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'Proteins'),
-                onSaved: (value) =>
-                    _formData['proteins'] = int.parse(value ?? '0'),
-              ),
-              TextFormField(
-                initialValue: _formData['carbohydrate'].toString(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'Carbohydrate'),
-                onSaved: (value) =>
-                    _formData['carbohydrate'] = int.parse(value ?? '0'),
-              ),
-              TextFormField(
-                initialValue: _formData['fat'].toString(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'Fat'),
-                onSaved: (value) => _formData['fat'] = int.parse(value ?? '0'),
-              ),
-            ]),
-          )),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(10),
+              child: Form(
+                key: _form,
+                child: Column(children: [
+                  TextFormField(
+                    initialValue: _formData['name'],
+                    decoration: const InputDecoration(labelText: 'Name'),
+                    onSaved: (value) => _formData['name'] = value,
+                  ),
+                  TextFormField(
+                    initialValue: _formData['grams'].toString(),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(labelText: 'Grams'),
+                    onSaved: (value) =>
+                        _formData['grams'] = int.parse(value ?? '0'),
+                  ),
+                  TextFormField(
+                    initialValue: _formData['kcal'].toString(),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(labelText: 'Kcal'),
+                    onSaved: (value) =>
+                        _formData['kcal'] = int.parse(value ?? '0'),
+                  ),
+                  TextFormField(
+                    initialValue: _formData['proteins'].toString(),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(labelText: 'Proteins'),
+                    onSaved: (value) =>
+                        _formData['proteins'] = int.parse(value ?? '0'),
+                  ),
+                  TextFormField(
+                    initialValue: _formData['carbohydrate'].toString(),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration:
+                        const InputDecoration(labelText: 'Carbohydrate'),
+                    onSaved: (value) =>
+                        _formData['carbohydrate'] = int.parse(value ?? '0'),
+                  ),
+                  TextFormField(
+                    initialValue: _formData['fat'].toString(),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(labelText: 'Fat'),
+                    onSaved: (value) =>
+                        _formData['fat'] = int.parse(value ?? '0'),
+                  ),
+                ]),
+              )),
     );
   }
 }
