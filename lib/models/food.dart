@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 class Food {
-  final int? id;
+  final String? id;
   final String name;
   final int kcal;
   final int grams;
